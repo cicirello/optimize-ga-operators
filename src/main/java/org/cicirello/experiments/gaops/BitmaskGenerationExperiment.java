@@ -24,6 +24,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import org.cicirello.math.rand.RandomSampler;
 import org.cicirello.math.rand.RandomVariates;
 import org.cicirello.math.stats.Statistics;
+import org.cicirello.util.DoubleList;
 
 /**
  * Experiment comparing CPU time of two alternatives for generating a random bit mask of a specified
@@ -106,8 +107,17 @@ public class BitmaskGenerationExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%6s\t%10s\t%10s\t%10s\t%10s\t%10s\n", "n", "u", "simple", "optimized", "t", "dof");
+          "%6s\t%11s\t%10s\t%10s\t%11s\t%10s\t%10s\n",
+          "n", "u", "simple", "optimized", "%less-time", "t", "dof");
+      DoubleList valuesOfU = new DoubleList();
       for (double u = 1.0 / bitLength; u - 0.5 <= 1E-10; u *= 2) {
+        valuesOfU.add(u);
+      }
+      valuesOfU.add(0.625);
+      valuesOfU.add(0.75);
+      valuesOfU.add(0.875);
+      for (int i = 0; i < valuesOfU.size(); i++) {
+        double u = valuesOfU.get(i);
         double[][] ms = new double[2][TRIALS];
         for (int j = 0; j < TRIALS; j++) {
           long start = bean.getCurrentThreadCpuTime();
@@ -129,14 +139,13 @@ public class BitmaskGenerationExperiment {
         double t = tTest[0].doubleValue();
         int dof = tTest[1].intValue();
         // times are converted to seconds during output
+        double timeSimpleSeconds = Statistics.mean(ms[0]) / 1000000000.0;
+        double timeOptimizedSeconds = Statistics.mean(ms[1]) / 1000000000.0;
+        double percentLessTime =
+            100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%6d\t%10.9f\t%10.7f\t%10.7f\t%10.4f\t%10d\n",
-            bitLength,
-            u,
-            Statistics.mean(ms[0]) / 1000000000.0,
-            Statistics.mean(ms[1]) / 1000000000.0,
-            t,
-            dof);
+            "%6d\t%10.9f\t%10.7f\t%10.7f\t%10.2f%%\t%10.4f\t%10d\n",
+            bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof);
       }
       System.out.println();
     }
