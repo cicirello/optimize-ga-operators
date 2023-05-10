@@ -21,6 +21,7 @@ package org.cicirello.experiments.gaops;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
+import org.cicirello.math.MathFunctions;
 import org.cicirello.math.rand.RandomSampler;
 import org.cicirello.math.rand.RandomVariates;
 import org.cicirello.math.stats.Statistics;
@@ -107,8 +108,8 @@ public class BitmaskGenerationExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%6s\t%11s\t%10s\t%10s\t%11s\t%10s\t%10s\n",
-          "n", "u", "simple", "optimized", "%less-time", "t", "dof");
+          "%4s\t%11s\t%10s\t%10s\t%11s\t%10s\t%10s\t%10s\n",
+          "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
       for (double u = 1.0 / bitLength; u - 0.5 <= 1E-10; u *= 2) {
         valuesOfU.add(u);
@@ -138,30 +139,82 @@ public class BitmaskGenerationExperiment {
         Number[] tTest = Statistics.tTestWelch(ms[0], ms[1]);
         double t = tTest[0].doubleValue();
         int dof = tTest[1].intValue();
-
+        double p = p(Math.abs(t), dof);
         // times are converted to seconds during output
         double timeSimpleSeconds = Statistics.mean(ms[0]) / 1000000000.0;
         double timeOptimizedSeconds = Statistics.mean(ms[1]) / 1000000000.0;
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%6d\t%10.9f\t%10.7f\t%10.7f\t%10.2f%%\t%10.4f\t%10d\n",
-            bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof);
+            "%4d\t%10.9f\t%10.7f\t%10.7f\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
     }
     System.out.println("Interpreting Above Results:");
     System.out.println("1) Negative t value implies simple version is faster.");
     System.out.println("2) Positive t value implies optimized version is faster.");
-    System.out.println(
-        "3) Greater absolute value of t value implies more significant time difference.");
-    System.out.println(
-        "4) You can use a table from any statistics book to map t value to p value,");
-    System.out.println(
-        "   and the dof column in results provides the degrees of freedom for the test");
-    System.out.println("   needed to do so.");
+    System.out.println("3) The p column is, well, the p value.");
 
     System.out.println(
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
+  }
+
+  private static double p(double t, int dof) {
+    return betai(0.5 * dof, 0.5, dof / (dof + t * t));
+  }
+
+  private static double betai(double a, double b, double x) {
+    if (x < 0 || x > 1) throw new IllegalArgumentException("x must be in [0.0, 1.0]");
+    double bt =
+        (x == 0.0 || x == 1.0)
+            ? 0.0
+            : Math.exp(
+                MathFunctions.logGamma(a + b)
+                    - MathFunctions.logGamma(a)
+                    - MathFunctions.logGamma(b)
+                    + a * Math.log(x)
+                    + b * Math.log(1 - x));
+    if (x < (a + 1) / (a + b + 2)) {
+      return bt * betacf(a, b, x) / a;
+    } else {
+      return 1 - bt * betacf(b, a, 1 - x) / b;
+    }
+  }
+
+  private static double betacf(double a, double b, double x) {
+    final int MAXIT = 100;
+    final double EPS = 3e-7;
+    final double FPMIN = 1e-30;
+    double qab = a + b;
+    double qap = a + 1;
+    double qam = a - 1;
+    double c = 1;
+    double d = 1 - qab * x / qap;
+    if (Math.abs(d) < FPMIN) d = FPMIN;
+    d = 1 / d;
+    double h = d;
+    int m;
+    for (m = 1; m <= MAXIT; m++) {
+      int m2 = 2 * m;
+      double aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+      d = 1 + aa * d;
+      if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c;
+      if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      h *= d * c;
+      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+      d = 1 + aa * d;
+      if (Math.abs(d) < FPMIN) d = FPMIN;
+      c = 1 + aa / c;
+      if (Math.abs(c) < FPMIN) c = FPMIN;
+      d = 1 / d;
+      double del = d * c;
+      h *= del;
+      if (Math.abs(del - 1) < EPS) break;
+    }
+    if (m > MAXIT) throw new ArithmeticException("Failed to converge.");
+    return h;
   }
 }
