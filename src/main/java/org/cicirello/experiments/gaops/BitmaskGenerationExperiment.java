@@ -138,6 +138,7 @@ public class BitmaskGenerationExperiment {
         Number[] tTest = Statistics.tTestWelch(ms[0], ms[1]);
         double t = tTest[0].doubleValue();
         int dof = tTest[1].intValue();
+
         // times are converted to seconds during output
         double timeSimpleSeconds = Statistics.mean(ms[0]) / 1000000000.0;
         double timeOptimizedSeconds = Statistics.mean(ms[1]) / 1000000000.0;
