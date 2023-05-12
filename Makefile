@@ -21,3 +21,9 @@ experiments: bitmasks
 .PHONY: bitmasks
 bitmasks:
 	java -cp ${JARFILE} org.cicirello.experiments.gaops.BitmaskGenerationExperiment > ${pathToDataFiles}/bitmasks.txt
+
+# Experiments with two variations of bit flip mutation
+
+.PHONY: mutation
+mutation:
+	java -cp ${JARFILE} org.cicirello.experiments.gaops.MutationExperiment > ${pathToDataFiles}/mutation.txt
