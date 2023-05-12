@@ -39,7 +39,7 @@ public class BitmaskGenerationExperiment {
   private static final int TRIALS = 100;
 
   /** Number of samples for each trial. Need multiple to ensure times are measurable. */
-  private static final int SAMPLES_PER_TRIAL = 10000;
+  private static final int SAMPLES_PER_TRIAL = 100000;
 
   /**
    * Generates a random bit mask.
@@ -107,7 +107,7 @@ public class BitmaskGenerationExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%4s\t%11s\t%10s\t%10s\t%11s\t%10s\t%10s\t%10s\n",
+          "%4s\t%12s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
       for (double u = 1.0 / bitLength; u - 0.5 <= 1E-10; u *= 2) {
@@ -145,7 +145,7 @@ public class BitmaskGenerationExperiment {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%10.9f\t%10.7f\t%10.7f\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            "%4d\t%11.10f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
             bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
