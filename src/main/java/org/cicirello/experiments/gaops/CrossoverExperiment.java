@@ -157,14 +157,13 @@ public class CrossoverExperiment {
     @Override
     public void cross(BitVector c1, BitVector c2) {
       int n = c1.length();
-      int[] bits = new int[(n + 31) >> 5];
+      BitVector mask = new BitVector(n);
       for (int index = 0; index < n; index++) {
         if (ThreadLocalRandom.current().nextDouble() < p) {
-          int i = index >> 5;
-          bits[i] ^= (1 << (index - (i << 5)));
+          mask.flip(index);
         }
       }
-      BitVector.exchangeBits(c1, c2, new BitVector(n, bits));
+      BitVector.exchangeBits(c1, c2, mask);
     }
 
     @Override
