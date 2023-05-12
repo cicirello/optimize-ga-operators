@@ -21,7 +21,6 @@ package org.cicirello.experiments.gaops;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
-import org.cicirello.math.MathFunctions;
 import org.cicirello.math.rand.RandomSampler;
 import org.cicirello.math.rand.RandomVariates;
 import org.cicirello.math.stats.Statistics;
@@ -139,7 +138,7 @@ public class BitmaskGenerationExperiment {
         Number[] tTest = Statistics.tTestWelch(ms[0], ms[1]);
         double t = tTest[0].doubleValue();
         int dof = tTest[1].intValue();
-        double p = p(Math.abs(t), dof);
+        double p = Statistics.p(t, dof);
         // times are converted to seconds during output
         double timeSimpleSeconds = Statistics.mean(ms[0]) / 1000000000.0;
         double timeOptimizedSeconds = Statistics.mean(ms[1]) / 1000000000.0;
@@ -158,63 +157,5 @@ public class BitmaskGenerationExperiment {
 
     System.out.println(
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
-  }
-
-  private static double p(double t, int dof) {
-    return betai(0.5 * dof, 0.5, dof / (dof + t * t));
-  }
-
-  private static double betai(double a, double b, double x) {
-    if (x < 0 || x > 1) throw new IllegalArgumentException("x must be in [0.0, 1.0]");
-    double bt =
-        (x == 0.0 || x == 1.0)
-            ? 0.0
-            : Math.exp(
-                MathFunctions.logGamma(a + b)
-                    - MathFunctions.logGamma(a)
-                    - MathFunctions.logGamma(b)
-                    + a * Math.log(x)
-                    + b * Math.log(1 - x));
-    if (x < (a + 1) / (a + b + 2)) {
-      return bt * betacf(a, b, x) / a;
-    } else {
-      return 1 - bt * betacf(b, a, 1 - x) / b;
-    }
-  }
-
-  private static double betacf(double a, double b, double x) {
-    final int MAXIT = 100;
-    final double EPS = 3e-7;
-    final double FPMIN = 1e-30;
-    double qab = a + b;
-    double qap = a + 1;
-    double qam = a - 1;
-    double c = 1;
-    double d = 1 - qab * x / qap;
-    if (Math.abs(d) < FPMIN) d = FPMIN;
-    d = 1 / d;
-    double h = d;
-    int m;
-    for (m = 1; m <= MAXIT; m++) {
-      int m2 = 2 * m;
-      double aa = m * (b - m) * x / ((qam + m2) * (a + m2));
-      d = 1 + aa * d;
-      if (Math.abs(d) < FPMIN) d = FPMIN;
-      c = 1 + aa / c;
-      if (Math.abs(c) < FPMIN) c = FPMIN;
-      d = 1 / d;
-      h *= d * c;
-      aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
-      d = 1 + aa * d;
-      if (Math.abs(d) < FPMIN) d = FPMIN;
-      c = 1 + aa / c;
-      if (Math.abs(c) < FPMIN) c = FPMIN;
-      d = 1 / d;
-      double del = d * c;
-      h *= del;
-      if (Math.abs(del - 1) < EPS) break;
-    }
-    if (m > MAXIT) throw new ArithmeticException("Failed to converge.");
-    return h;
   }
 }
