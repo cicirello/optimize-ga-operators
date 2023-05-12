@@ -14,7 +14,7 @@ build:
 # Runs all experiments
 
 .PHONY: experiments
-experiments: bitmasks
+experiments: bitmasks mutation crossover
 	
 # Experiments with two variations of generating random bit masks
 
@@ -27,3 +27,9 @@ bitmasks:
 .PHONY: mutation
 mutation:
 	java -cp ${JARFILE} org.cicirello.experiments.gaops.MutationExperiment > ${pathToDataFiles}/mutation.txt
+
+# Experiments with two variations of uniform crossover
+
+.PHONY: crossover
+crossover:
+	java -cp ${JARFILE} org.cicirello.experiments.gaops.CrossoverExperiment > ${pathToDataFiles}/crossover.txt
