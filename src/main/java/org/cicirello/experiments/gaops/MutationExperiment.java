@@ -28,7 +28,7 @@ import org.cicirello.search.representations.BitVector;
 import org.cicirello.util.DoubleList;
 
 /**
- * Experiment comparing CPU time of two alternatives bit-flip mutation.
+ * Experiment comparing CPU time of two alternative bit-flip mutation implementations.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
@@ -71,7 +71,7 @@ public class MutationExperiment {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    for (double m = 1.0 / 1024; m - 0.5 <= 1E-10; m *= 2) {
+    for (double m = 1.0 / 1024; m - 0.25 <= 1E-10; m *= 2) {
       SimpleBitFlipMutation simple = new SimpleBitFlipMutation(m);
       BitFlipMutation optimized = new BitFlipMutation(m);
       BitVector v = new BitVector(1024);
