@@ -21,19 +21,19 @@ package org.cicirello.experiments.gaops;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
-import org.cicirello.math.rand.RandomSampler;
-import org.cicirello.math.rand.RandomVariates;
 import org.cicirello.math.stats.Statistics;
+import org.cicirello.search.operators.MutationOperator;
+import org.cicirello.search.operators.bits.BitFlipMutation;
+import org.cicirello.search.representations.BitVector;
 import org.cicirello.util.DoubleList;
 
 /**
- * Experiment comparing CPU time of two alternatives for generating a random bit mask of a specified
- * length and with a specified probability of a 1-bit.
+ * Experiment comparing CPU time of two alternative bit-flip mutation implementations.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
-public class BitmaskGenerationExperiment {
+public class MutationExperiment {
 
   /** Number of trials to average. */
   private static final int TRIALS = 100;
@@ -42,40 +42,21 @@ public class BitmaskGenerationExperiment {
   private static final int SAMPLES_PER_TRIAL = 100000;
 
   /**
-   * Generates a random bit mask.
+   * Mutates a BitVector SAMPLES_PER_TRIAL times.
    *
-   * @param n length of the bit mask
-   * @param u probability of a 1-bit
-   * @return returns the bit mask
+   * @param mutation the mutation operator
+   * @param mutateMe the BitVector to mutate
+   * @return a meaningless value dependent upon result of all mutations for purpose of preventing
+   *     JIT from optimizing away the computation
    */
-  public static int[] bitMaskOptimized(int n, double u) {
-    int[] bits = new int[(n + 31) >> 5];
-    int[] bitsToSet =
-        RandomSampler.sample(
-            n, RandomVariates.nextBinomial(n, u), null, ThreadLocalRandom.current());
-    for (int index : bitsToSet) {
-      int i = index >> 5;
-      bits[i] ^= (1 << (index - (i << 5)));
+  public static int mutationCodeToTime(MutationOperator<BitVector> mutation, BitVector mutateMe) {
+    int useToPreventOptimizingAway = 0;
+    int length32 = (mutateMe.length() + 31) >> 5;
+    for (int i = 0; i < SAMPLES_PER_TRIAL; i++) {
+      mutation.mutate(mutateMe);
+      useToPreventOptimizingAway += mutateMe.get32(i % length32);
     }
-    return bits;
-  }
-
-  /**
-   * Generates a random bit mask.
-   *
-   * @param n length of the bit mask
-   * @param u probability of a 1-bit
-   * @return returns the bit mask
-   */
-  public static int[] bitMaskSimple(int n, double u) {
-    int[] bits = new int[(n + 31) >> 5];
-    for (int index = 0; index < n; index++) {
-      if (ThreadLocalRandom.current().nextDouble() < u) {
-        int i = index >> 5;
-        bits[i] ^= (1 << (index - (i << 5)));
-      }
-    }
-    return bits;
+    return useToPreventOptimizingAway;
   }
 
   /**
@@ -90,17 +71,12 @@ public class BitmaskGenerationExperiment {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    for (double u = 1.0 / 1024; u - 0.5 <= 1E-10; u *= 2) {
-      for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-        int[] maskSimple = bitMaskSimple(1024, u);
-        useToPreventOptimizingAway += maskSimple[k % maskSimple.length];
-      }
-    }
-    for (double u = 1.0 / 1024; u - 0.5 <= 1E-10; u *= 2) {
-      for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-        int[] maskOptimized = bitMaskOptimized(1024, u);
-        useToPreventOptimizingAway += maskOptimized[k % maskOptimized.length];
-      }
+    for (double m = 1.0 / 1024; m - 0.25 <= 1E-10; m *= 2) {
+      SimpleBitFlipMutation simple = new SimpleBitFlipMutation(m);
+      BitFlipMutation optimized = new BitFlipMutation(m);
+      BitVector v = new BitVector(1024);
+      useToPreventOptimizingAway += mutationCodeToTime(simple, v);
+      useToPreventOptimizingAway += mutationCodeToTime(optimized, v);
     }
     System.out.println("End Warmup Phase");
     System.out.println();
@@ -109,27 +85,21 @@ public class BitmaskGenerationExperiment {
       System.out.printf(
           "%4s\t%12s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
-      DoubleList valuesOfU = new DoubleList();
-      for (double u = 1.0 / bitLength; u - 0.5 <= 1E-10; u *= 2) {
-        valuesOfU.add(u);
+      DoubleList valuesOfM = new DoubleList();
+      for (double m = 1.0 / bitLength; m - 0.25 <= 1E-10; m *= 2) {
+        valuesOfM.add(m);
       }
-      valuesOfU.add(0.625);
-      valuesOfU.add(0.75);
-      valuesOfU.add(0.875);
-      for (int i = 0; i < valuesOfU.size(); i++) {
-        double u = valuesOfU.get(i);
+      for (int i = 0; i < valuesOfM.size(); i++) {
+        double m = valuesOfM.get(i);
+        SimpleBitFlipMutation simple = new SimpleBitFlipMutation(m);
+        BitFlipMutation optimized = new BitFlipMutation(m);
+        BitVector bits = new BitVector(bitLength);
         double[][] ms = new double[2][TRIALS];
         for (int j = 0; j < TRIALS; j++) {
           long start = bean.getCurrentThreadCpuTime();
-          for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-            int[] maskSimple = bitMaskSimple(bitLength, u);
-            useToPreventOptimizingAway += maskSimple[k % maskSimple.length];
-          }
+          useToPreventOptimizingAway += mutationCodeToTime(simple, bits);
           long middle = bean.getCurrentThreadCpuTime();
-          for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-            int[] maskOptimized = bitMaskOptimized(bitLength, u);
-            useToPreventOptimizingAway += maskOptimized[k % maskOptimized.length];
-          }
+          useToPreventOptimizingAway += mutationCodeToTime(optimized, bits);
           long end = bean.getCurrentThreadCpuTime();
           // compute elapsed times in nanoseconds
           ms[0][j] = (middle - start);
@@ -146,7 +116,7 @@ public class BitmaskGenerationExperiment {
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
             "%4d\t%11.10f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
-            bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
+            bitLength, m, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
     }
@@ -157,5 +127,47 @@ public class BitmaskGenerationExperiment {
 
     System.out.println(
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
+  }
+
+  private static class SimpleBitFlipMutation implements MutationOperator<BitVector> {
+
+    private final double m;
+
+    /**
+     * Constructs a SimpleBitFlipMutation operator with a specified mutation rate.
+     *
+     * @param m The mutation rate, which is the probability of flipping any individual bit. The
+     *     expected number of bits flipped during a call to the {@link #mutate} method is m*N where
+     *     N is the length of the mutated BitVector. There is no guarantee that any bits will be
+     *     flipped during a mutation (e.g., if m is close to 0).
+     * @throws IllegalArgumentException if m &le; 0 or if m &ge; 1.
+     */
+    public SimpleBitFlipMutation(double m) {
+      if (m <= 0 || m >= 1) throw new IllegalArgumentException("m constrained by: 0.0 < m < 1.0");
+      this.m = m;
+    }
+
+    /*
+     * internal copy constructor
+     */
+    private SimpleBitFlipMutation(SimpleBitFlipMutation other) {
+      m = other.m;
+      // deliberately don't copy bitMask (each instance needs to maintain its own for undo)
+    }
+
+    @Override
+    public void mutate(BitVector c) {
+      int numBits = c.length();
+      for (int index = 0; index < numBits; index++) {
+        if (ThreadLocalRandom.current().nextDouble() < m) {
+          c.flip(index);
+        }
+      }
+    }
+
+    @Override
+    public SimpleBitFlipMutation split() {
+      return new SimpleBitFlipMutation(this);
+    }
   }
 }

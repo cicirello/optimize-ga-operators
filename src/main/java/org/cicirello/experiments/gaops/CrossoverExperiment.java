@@ -21,19 +21,19 @@ package org.cicirello.experiments.gaops;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
 import java.util.concurrent.ThreadLocalRandom;
-import org.cicirello.math.rand.RandomSampler;
-import org.cicirello.math.rand.RandomVariates;
 import org.cicirello.math.stats.Statistics;
+import org.cicirello.search.operators.CrossoverOperator;
+import org.cicirello.search.operators.bits.UniformCrossover;
+import org.cicirello.search.representations.BitVector;
 import org.cicirello.util.DoubleList;
 
 /**
- * Experiment comparing CPU time of two alternatives for generating a random bit mask of a specified
- * length and with a specified probability of a 1-bit.
+ * Experiment comparing CPU time of two alternative uniform mutation implementations.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
-public class BitmaskGenerationExperiment {
+public class CrossoverExperiment {
 
   /** Number of trials to average. */
   private static final int TRIALS = 100;
@@ -42,40 +42,24 @@ public class BitmaskGenerationExperiment {
   private static final int SAMPLES_PER_TRIAL = 100000;
 
   /**
-   * Generates a random bit mask.
+   * Crosses 2 BitVectors SAMPLES_PER_TRIAL times.
    *
-   * @param n length of the bit mask
-   * @param u probability of a 1-bit
-   * @return returns the bit mask
+   * @param crossover the crossover operator
+   * @param v1 a BitVector
+   * @param v2 another BitVector
+   * @return a meaningless value dependent upon result of all crossovers for purpose of preventing
+   *     JIT from optimizing away the computation
    */
-  public static int[] bitMaskOptimized(int n, double u) {
-    int[] bits = new int[(n + 31) >> 5];
-    int[] bitsToSet =
-        RandomSampler.sample(
-            n, RandomVariates.nextBinomial(n, u), null, ThreadLocalRandom.current());
-    for (int index : bitsToSet) {
-      int i = index >> 5;
-      bits[i] ^= (1 << (index - (i << 5)));
+  public static int crossoverCodeToTime(
+      CrossoverOperator<BitVector> crossover, BitVector v1, BitVector v2) {
+    int useToPreventOptimizingAway = 0;
+    int length32 = (v1.length() + 31) >> 5;
+    for (int i = 0; i < SAMPLES_PER_TRIAL; i++) {
+      crossover.cross(v1, v2);
+      int j = i % length32;
+      useToPreventOptimizingAway += v1.get32(j) + v2.get32(j);
     }
-    return bits;
-  }
-
-  /**
-   * Generates a random bit mask.
-   *
-   * @param n length of the bit mask
-   * @param u probability of a 1-bit
-   * @return returns the bit mask
-   */
-  public static int[] bitMaskSimple(int n, double u) {
-    int[] bits = new int[(n + 31) >> 5];
-    for (int index = 0; index < n; index++) {
-      if (ThreadLocalRandom.current().nextDouble() < u) {
-        int i = index >> 5;
-        bits[i] ^= (1 << (index - (i << 5)));
-      }
-    }
-    return bits;
+    return useToPreventOptimizingAway;
   }
 
   /**
@@ -90,46 +74,37 @@ public class BitmaskGenerationExperiment {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    for (double u = 1.0 / 1024; u - 0.5 <= 1E-10; u *= 2) {
-      for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-        int[] maskSimple = bitMaskSimple(1024, u);
-        useToPreventOptimizingAway += maskSimple[k % maskSimple.length];
-      }
-    }
-    for (double u = 1.0 / 1024; u - 0.5 <= 1E-10; u *= 2) {
-      for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-        int[] maskOptimized = bitMaskOptimized(1024, u);
-        useToPreventOptimizingAway += maskOptimized[k % maskOptimized.length];
-      }
+    for (double u = 0.1; u < 0.55; u += 0.1) {
+      SimpleUniformCrossover simple = new SimpleUniformCrossover(u);
+      UniformCrossover optimized = new UniformCrossover(u);
+      BitVector v1 = new BitVector(1024, true);
+      BitVector v2 = new BitVector(1024, true);
+      useToPreventOptimizingAway += crossoverCodeToTime(simple, v1, v2);
+      useToPreventOptimizingAway += crossoverCodeToTime(optimized, v1, v2);
     }
     System.out.println("End Warmup Phase");
     System.out.println();
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%4s\t%12s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
+          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
-      for (double u = 1.0 / bitLength; u - 0.5 <= 1E-10; u *= 2) {
+      for (double u = 0.1; u < 0.55; u += 0.1) {
         valuesOfU.add(u);
       }
-      valuesOfU.add(0.625);
-      valuesOfU.add(0.75);
-      valuesOfU.add(0.875);
       for (int i = 0; i < valuesOfU.size(); i++) {
         double u = valuesOfU.get(i);
+        SimpleUniformCrossover simple = new SimpleUniformCrossover(u);
+        UniformCrossover optimized = new UniformCrossover(u);
+        BitVector bits1 = new BitVector(bitLength, true);
+        BitVector bits2 = new BitVector(bitLength, true);
         double[][] ms = new double[2][TRIALS];
         for (int j = 0; j < TRIALS; j++) {
           long start = bean.getCurrentThreadCpuTime();
-          for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-            int[] maskSimple = bitMaskSimple(bitLength, u);
-            useToPreventOptimizingAway += maskSimple[k % maskSimple.length];
-          }
+          useToPreventOptimizingAway += crossoverCodeToTime(simple, bits1, bits2);
           long middle = bean.getCurrentThreadCpuTime();
-          for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-            int[] maskOptimized = bitMaskOptimized(bitLength, u);
-            useToPreventOptimizingAway += maskOptimized[k % maskOptimized.length];
-          }
+          useToPreventOptimizingAway += crossoverCodeToTime(optimized, bits1, bits2);
           long end = bean.getCurrentThreadCpuTime();
           // compute elapsed times in nanoseconds
           ms[0][j] = (middle - start);
@@ -145,7 +120,7 @@ public class BitmaskGenerationExperiment {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%11.10f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
             bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
@@ -157,5 +132,44 @@ public class BitmaskGenerationExperiment {
 
     System.out.println(
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
+  }
+
+  private static class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
+
+    private final double p;
+
+    /**
+     * Constructs a uniform crossover operator.
+     *
+     * @param p The per-bit probability of exchanging each bit between the parents in forming the
+     *     children. The expected number of bits exchanged during a single call to {@link #cross} is
+     *     thus p*N, where N is the length of the BitVector.
+     */
+    public SimpleUniformCrossover(double p) {
+      this.p = p <= 0.0 ? 0.0 : (p >= 1.0 ? 1.0 : p);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @throws IllegalArgumentException if c1.length() is not equal to c2.length()
+     */
+    @Override
+    public void cross(BitVector c1, BitVector c2) {
+      int n = c1.length();
+      BitVector mask = new BitVector(n);
+      for (int index = 0; index < n; index++) {
+        if (ThreadLocalRandom.current().nextDouble() < p) {
+          mask.flip(index);
+        }
+      }
+      BitVector.exchangeBits(c1, c2, mask);
+    }
+
+    @Override
+    public SimpleUniformCrossover split() {
+      // Maintains no mutable state, so just return this.
+      return this;
+    }
   }
 }
