@@ -14,7 +14,7 @@ build:
 # Runs all experiments
 
 .PHONY: experiments
-experiments: bitmasks mutation crossover
+experiments: bitmasks mutation crossover generation
 	
 # Experiments with two variations of generating random bit masks
 
