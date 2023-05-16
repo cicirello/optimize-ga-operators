@@ -66,7 +66,7 @@ public class GAExperiment {
     OneMaxFitness fitness = new OneMaxFitness();
     final int BIT_LENGTH = 1024;
     final double MUTATION_RATE = 1.0 / BIT_LENGTH;
-    double[] U_VALUES = {0.33, 0.5};
+    double[] U_VALUES = {0.33, 0.49};
 
     DoubleList valuesOfC = new DoubleList();
     for (double c = 0.05; c < 1; c += 0.1) {
