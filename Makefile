@@ -33,3 +33,9 @@ mutation:
 .PHONY: crossover
 crossover:
 	java -cp ${JARFILE} org.cicirello.experiments.gaops.CrossoverExperiment > ${pathToDataFiles}/crossover.txt
+
+# Experiments with two variations of a generation implementation
+
+.PHONY: generation
+generation:
+	java -cp ${JARFILE} org.cicirello.experiments.gaops.GenerationLoopExperiment > ${pathToDataFiles}/generation.txt
