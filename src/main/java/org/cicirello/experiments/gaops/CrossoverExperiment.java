@@ -134,7 +134,8 @@ public class CrossoverExperiment {
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
   }
 
-  private static class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
+  /** The commonly found implementation of uniform crossover. */
+  public static class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
 
     private final double p;
 
@@ -149,11 +150,6 @@ public class CrossoverExperiment {
       this.p = p <= 0.0 ? 0.0 : (p >= 1.0 ? 1.0 : p);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws IllegalArgumentException if c1.length() is not equal to c2.length()
-     */
     @Override
     public void cross(BitVector c1, BitVector c2) {
       int n = c1.length();
