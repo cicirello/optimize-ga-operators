@@ -14,7 +14,7 @@ build:
 # Runs all experiments
 
 .PHONY: experiments
-experiments: bitmasks mutation crossover generation ga
+experiments: bitmasks mutation crossover generation ga ga2
 	
 # Experiments with two variations of generating random bit masks
 
@@ -40,8 +40,14 @@ crossover:
 generation:
 	java -cp ${JARFILE} org.cicirello.experiments.gaops.GenerationLoopExperiment > ${pathToDataFiles}/generation.txt
 
-# Experiments with two variations of the GA implementation
+# Experiments with two variations of the GA implementation (uniform crossover, bit flip mutation)
 
 .PHONY: ga
 ga:
 	java -cp ${JARFILE} org.cicirello.experiments.gaops.GAExperiment > ${pathToDataFiles}/ga.txt
+
+# Experiments with two variations of the GA implementation (bit flip mutation, but 1-point or 2-point crossover)
+
+.PHONY: ga2
+ga2:
+	java -cp ${JARFILE} org.cicirello.experiments.gaops.GAExperiment2 > ${pathToDataFiles}/ga2.txt
