@@ -129,7 +129,8 @@ public class MutationExperiment {
         "\nOutput to ensure can't optimize away anything: " + useToPreventOptimizingAway);
   }
 
-  private static class SimpleBitFlipMutation implements MutationOperator<BitVector> {
+  /** The commonly found implementation of bit-flip mutation. */
+  public static class SimpleBitFlipMutation implements MutationOperator<BitVector> {
 
     private final double m;
 
