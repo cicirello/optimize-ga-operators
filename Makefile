@@ -17,8 +17,10 @@ build:
 figures:
 	$(py) -m pip install --user pycairo
 	$(py) -m pip install --user matplotlib
-	python -B src/analysis/figures.py data/mutation.txt
-	python -B src/analysis/figures.py data/crossover.txt
+	$(py) -B src/analysis/figures.py data/mutation.txt
+	$(py) -B src/analysis/figures.py data/crossover.txt
+	$(py) -B src/analysis/gafigures.py data/ga.txt
+	$(py) -B src/analysis/gafigures.py data/ga2.txt
 
 # Runs all experiments
 
