@@ -49,6 +49,7 @@ def parse(filename):
                 data[-1].append(row)
     return headings, data
 
+
 if __name__ == "__main__":
     datafile = sys.argv[1]
     headings, data = parse(datafile)

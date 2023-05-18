@@ -60,6 +60,7 @@ def parse(filename):
                 data[-1].append(row)
     return headings, data, ops
 
+
 if __name__ == "__main__":
     datafile = sys.argv[1]
     headings, data, ops = parse(datafile)
