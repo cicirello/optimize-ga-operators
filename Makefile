@@ -11,6 +11,15 @@ pathToDataFiles = "data"
 build:
 	mvn clean package
 
+# Generates figures for article
+
+.PHONY: figures
+figures:
+	$(py) -m pip install --user pycairo
+	$(py) -m pip install --user matplotlib
+	python -B src/analysis/figures.py data/mutation.txt
+	python -B src/analysis/figures.py data/crossover.txt
+
 # Runs all experiments
 
 .PHONY: experiments
