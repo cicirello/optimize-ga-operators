@@ -76,7 +76,7 @@ if __name__ == "__main__":
     matplotlib.pyplot.rc('font', size=9)
     matplotlib.pyplot.rc('text', usetex=True)
     for header, d, operator in zip(headings, data, ops):
-        fig, ax = matplotlib.pyplot.subplots(figsize=(w,h), constrained_layout=True)
+        fig, ax = matplotlib.pyplot.subplots(figsize=(w, h), constrained_layout=True)
         matplotlib.pyplot.xlabel(x_label)
         matplotlib.pyplot.ylabel(y_label)
         x = [row[0] for row in d]
@@ -86,12 +86,12 @@ if __name__ == "__main__":
             x,
             simple,
             "k-",
-            label = "simple")
+            label="simple")
         line, = ax.plot(
             x,
             optimized,
             "k--",
-            label = "optimized")
+            label="optimized")
         ax.legend(loc="center right")
         figure_filename = "{0}.{1}.{2}".format(datafile[:-4], operator, "svg")
         eps_filename = "{0}.{1}.{2}".format(datafile[:-4], operator, "eps")

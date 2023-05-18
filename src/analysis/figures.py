@@ -65,7 +65,7 @@ if __name__ == "__main__":
     matplotlib.pyplot.rc('font', size=9)
     matplotlib.pyplot.rc('text', usetex=True)
     for header, d in zip(headings, data):
-        fig, ax = matplotlib.pyplot.subplots(figsize=(w,h), constrained_layout=True)
+        fig, ax = matplotlib.pyplot.subplots(figsize=(w, h), constrained_layout=True)
         matplotlib.pyplot.xlabel(x_label)
         matplotlib.pyplot.ylabel(y_label)
         x = [row[1] for row in d]
@@ -77,12 +77,12 @@ if __name__ == "__main__":
             x,
             simple,
             "k-",
-            label = "simple")
+            label="simple")
         line, = ax.plot(
             x,
             optimized,
             "k--",
-            label = "optimized")
+            label="optimized")
         if "mutation" == base_filename:
             ax.legend(loc="center")
         elif "crossover" == base_filename and d[0][0] >= 128 and d[0][0] <= 512:
