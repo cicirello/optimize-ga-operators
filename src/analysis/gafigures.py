@@ -19,6 +19,7 @@ import sys
 import os
 import matplotlib.pyplot
 
+
 def parse(filename):
     """Parses a data file.
 
