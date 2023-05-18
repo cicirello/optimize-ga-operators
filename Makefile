@@ -11,6 +11,32 @@ pathToDataFiles = "data"
 build:
 	mvn clean package
 
+# Generates figures for article
+
+.PHONY: figures
+figures:
+	$(py) -m pip install --user pycairo
+	$(py) -m pip install --user matplotlib
+	$(py) -B src/analysis/figures.py data/mutation.txt
+	$(py) -B src/analysis/figures.py data/crossover.txt
+	$(py) -B src/analysis/gafigures.py data/ga.txt
+	$(py) -B src/analysis/gafigures.py data/ga2.txt
+
+.PHONY: epstopdf
+epstopdf:
+	epstopdf ${pathToDataFiles}/mutation.16.eps
+	epstopdf ${pathToDataFiles}/mutation.64.eps
+	epstopdf ${pathToDataFiles}/mutation.256.eps
+	epstopdf ${pathToDataFiles}/mutation.1024.eps
+	epstopdf ${pathToDataFiles}/crossover.16.eps
+	epstopdf ${pathToDataFiles}/crossover.64.eps
+	epstopdf ${pathToDataFiles}/crossover.256.eps
+	epstopdf ${pathToDataFiles}/crossover.1024.eps
+	epstopdf ${pathToDataFiles}/ga.U33.eps
+	epstopdf ${pathToDataFiles}/ga.U49.eps
+	epstopdf ${pathToDataFiles}/ga2.1p.eps
+	epstopdf ${pathToDataFiles}/ga2.2p.eps
+
 # Runs all experiments
 
 .PHONY: experiments
