@@ -5,12 +5,12 @@
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
@@ -58,7 +58,7 @@ def parse(filename):
                 row[11] = float(row[11])
                 data[-1].append(row)
     return headings, data, ops
-            
+
 if __name__ == "__main__":
     datafile = sys.argv[1]
     headings, data, ops = parse(datafile)
@@ -92,11 +92,6 @@ if __name__ == "__main__":
             label = "optimized")
         ax.legend(loc="center right")
         figure_filename = "{0}.{1}.{2}".format(datafile[:-4], operator, "svg")
-        eps_filename = "{0}.{1}.{2}".format(datafile[:-4], operator, "eps") 
+        eps_filename = "{0}.{1}.{2}".format(datafile[:-4], operator, "eps")
         matplotlib.pyplot.savefig(figure_filename)
         matplotlib.pyplot.savefig(eps_filename)
-        
-        
-        
-
-    
