@@ -32,9 +32,9 @@ def parse(filename):
         data = []
         for line in f:
             row = line.strip().split()
-            if len(row)==0:
+            if len(row) == 0:
                 ready_for_data = False
-            elif row[0]=="n":
+            elif row[0] == "n":
                 ready_for_data = True
                 headings.append(row)
                 data.append([])
@@ -84,7 +84,7 @@ if __name__ == "__main__":
             label = "optimized")
         if "mutation" == base_filename:
             ax.legend(loc="center")
-        elif "crossover" == base_filename and d[0][0]>=128 and d[0][0] <= 512:
+        elif "crossover" == base_filename and d[0][0] >= 128 and d[0][0] <= 512:
             ax.legend(loc="center")
         else:
             ax.legend()

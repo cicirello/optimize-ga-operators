@@ -33,15 +33,15 @@ def parse(filename):
         ops = []
         for line in f:
             row = line.strip().split()
-            if len(row)==0:
+            if len(row) == 0:
                 ready_for_data = False
-            elif row[0]=="Uniform":
+            elif row[0] == "Uniform":
                 ops.append("U"+row[-1][-2:])
-            elif row[0]=="SinglePointCrossover":
+            elif row[0] == "SinglePointCrossover":
                 ops.append("1p")
-            elif row[0]=="TwoPointCrossover":
+            elif row[0] == "TwoPointCrossover":
                 ops.append("2p")
-            elif row[0]=="c":
+            elif row[0] == "c":
                 ready_for_data = True
                 headings.append(row)
                 data.append([])
