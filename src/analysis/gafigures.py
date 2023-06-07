@@ -67,7 +67,7 @@ if __name__ == "__main__":
 
     base_filename = os.path.basename(datafile)[:-4]
 
-    x_label = "crossover rate C"
+    x_label = "crossover rate c"
 
     y_label = "CPU time (seconds)"
 

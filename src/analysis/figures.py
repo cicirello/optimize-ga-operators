@@ -56,7 +56,7 @@ if __name__ == "__main__":
 
     base_filename = os.path.basename(datafile)[:-4]
 
-    x_label = "mutation rate M (log scale)" if "mutation" == base_filename else "uniform crossover bit-rate U"
+    x_label = "mutation rate m (log scale)" if "mutation" == base_filename else "uniform crossover bit-rate u"
 
     y_label = "CPU time (seconds)"
 
