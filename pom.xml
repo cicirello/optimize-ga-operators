@@ -151,7 +151,7 @@
 					<plugin>
 						<groupId>org.hjug.refactorfirst.plugin</groupId>
 						<artifactId>refactor-first-maven-plugin</artifactId>
-						<version>0.3.0</version>       
+						<version>0.4.0</version>       
 						<configuration>
 							<showDetails>true</showDetails>
 						</configuration>
@@ -185,13 +185,13 @@
 		<dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
-			<version>5.9.3</version>
+			<version>5.10.0</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.cicirello</groupId>
 			<artifactId>chips-n-salsa</artifactId>
-			<version>6.3.0</version>
+			<version>6.4.0</version>
 		</dependency>
 		<dependency>
 			<groupId>org.cicirello</groupId>
@@ -291,7 +291,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
-				<version>3.4.1</version>
+				<version>3.5.0</version>
 				<configuration>
 					<shadedArtifactAttached>true</shadedArtifactAttached>
 					<shadedClassifierName>jar-with-dependencies</shadedClassifierName>
