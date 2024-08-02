@@ -74,7 +74,8 @@ public class CrossoverExperiment {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    for (double u = 0.1; u < 0.55; u += 0.1) {
+    double[] rates = {0.1, 0.2, 0.3, 0.4, 0.5};
+    for (double u : rates) {
       SimpleUniformCrossover simple = new SimpleUniformCrossover(u);
       UniformCrossover optimized = new UniformCrossover(u);
       BitVector v1 = new BitVector(1024, true);
@@ -90,7 +91,7 @@ public class CrossoverExperiment {
           "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
-      for (double u = 0.1; u < 0.55; u += 0.1) {
+      for (double u : rates) {
         valuesOfU.add(u);
       }
       for (int i = 0; i < valuesOfU.size(); i++) {

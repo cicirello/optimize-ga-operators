@@ -75,7 +75,8 @@ public class GAExperiment2 {
     xover.add(new TwoPointCrossover());
 
     DoubleList valuesOfC = new DoubleList();
-    for (double c = 0.05; c < 1; c += 0.1) {
+    double[] rates = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
+    for (double c : rates) {
       valuesOfC.add(c);
     }
 
