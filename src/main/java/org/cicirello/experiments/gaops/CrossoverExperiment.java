@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ public class CrossoverExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
+          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
       for (double u = 0.1; u < 0.55; u += 0.1) {
@@ -120,7 +120,7 @@ public class CrossoverExperiment {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g%n",
             bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
