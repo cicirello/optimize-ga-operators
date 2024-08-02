@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,7 +69,8 @@ public class GAExperiment {
     double[] U_VALUES = {0.33, 0.49};
 
     DoubleList valuesOfC = new DoubleList();
-    for (double c = 0.05; c < 1; c += 0.1) {
+    double[] rates = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
+    for (double c : rates) {
       valuesOfC.add(c);
     }
 
@@ -109,9 +110,9 @@ public class GAExperiment {
     System.out.println();
 
     for (double u : U_VALUES) {
-      System.out.printf("Uniform Crossover Parameter U=%3.2f\n", u);
+      System.out.printf("Uniform Crossover Parameter U=%3.2f%n", u);
       System.out.printf(
-          "%4s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\t%12s\t%12s\t%10s\t%10s\t%10s\n",
+          "%4s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\t%12s\t%12s\t%10s\t%10s\t%10s%n",
           "c",
           "simple",
           "optimized",
@@ -182,7 +183,7 @@ public class GAExperiment {
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
 
         System.out.printf(
-            "%3.2f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\t%12.2f\t%12.2f\t%10.4f\t%10d\t%10.3g\n",
+            "%3.2f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\t%12.2f\t%12.2f\t%10.4f\t%10d\t%10.3g%n",
             c,
             timeSimpleSeconds,
             timeOptimizedSeconds,
@@ -215,7 +216,7 @@ public class GAExperiment {
    * optimal is found and then terminate). This class doesn't specify a bound on the optimal
    * preventing the EA from early termination.
    */
-  private static class OneMaxFitness
+  private static final class OneMaxFitness
       implements FitnessFunction.Integer<BitVector>, IntegerCostOptimizationProblem<BitVector> {
 
     @Override

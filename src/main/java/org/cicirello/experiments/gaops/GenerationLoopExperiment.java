@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -70,7 +70,8 @@ public class GenerationLoopExperiment {
     NoOpSelection selection = new NoOpSelection();
 
     DoubleList valuesOfC = new DoubleList();
-    for (double c = 0.05; c < 1; c += 0.1) {
+    double[] rates = {0.05, 0.15, 0.25, 0.35, 0.45, 0.55, 0.65, 0.75, 0.85, 0.95};
+    for (double c : rates) {
       valuesOfC.add(c);
     }
 
@@ -96,7 +97,7 @@ public class GenerationLoopExperiment {
     System.out.println();
 
     System.out.printf(
-        "%4s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\t%12s\t%12s\t%10s\t%10s\t%10s\n",
+        "%4s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\t%12s\t%12s\t%10s\t%10s\t%10s%n",
         "c",
         "simple",
         "optimized",
@@ -156,7 +157,7 @@ public class GenerationLoopExperiment {
           100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
 
       System.out.printf(
-          "%3.2f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\t%12.3g\t%12.3g\t%10.4f\t%10d\t%10.3g\n",
+          "%3.2f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\t%12.3g\t%12.3g\t%10.4f\t%10d\t%10.3g%n",
           c,
           timeSimpleSeconds,
           timeOptimizedSeconds,
@@ -186,7 +187,7 @@ public class GenerationLoopExperiment {
    * the effects of optimizing the generation loop, so using a mutation that does nothing to
    * eliminate the time effects of mutation.
    */
-  private static class NoOpMutation implements MutationOperator<BitVector> {
+  private static final class NoOpMutation implements MutationOperator<BitVector> {
 
     private int state;
 
@@ -217,7 +218,7 @@ public class GenerationLoopExperiment {
    * study the effects of optimizing the generation loop, so using a crossover that does nothing to
    * eliminate the time effects of crossover.
    */
-  private static class NoOpCrossover implements CrossoverOperator<BitVector> {
+  private static final class NoOpCrossover implements CrossoverOperator<BitVector> {
 
     private int count;
 
@@ -252,7 +253,7 @@ public class GenerationLoopExperiment {
    * associated with selection to enable studying strictly the time of the two versions of the
    * generation loop.
    */
-  private static class NoOpSelection implements SelectionOperator {
+  private static final class NoOpSelection implements SelectionOperator {
 
     @Override
     public void select(PopulationFitnessVector.Integer fitnesses, int[] selected) {
@@ -279,7 +280,7 @@ public class GenerationLoopExperiment {
    * eliminate the time cost associated with fitness evaluation to enable studying strictly the time
    * of the two versions of the generation loop.
    */
-  private static class NoOpFitness
+  private static final class NoOpFitness
       implements FitnessFunction.Integer<BitVector>, IntegerCostOptimizationProblem<BitVector> {
 
     @Override

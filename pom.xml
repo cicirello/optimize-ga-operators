@@ -24,7 +24,7 @@
 		<distribution>repo</distribution>
 		<comments>
 		Experiments related to optimizing genetic algorithm operators.
-		Copyright (C) 2023 Vincent A. Cicirello.
+		Copyright (C) 2023-2024 Vincent A. Cicirello.
  
 		This program is free software: you can redistribute it and/or modify
 		it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@
 			</build>
 		</profile>
 		<profile>
-			<id>refactor</id>
+			<id>analysis</id>
 			<build>
 				<plugins>
 					<plugin>
@@ -161,6 +161,30 @@
 								<phase>test</phase>
 								<goals>
 									<goal>report</goal>
+								</goals>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>com.github.spotbugs</groupId>
+						<artifactId>spotbugs-maven-plugin</artifactId>
+						<version>4.8.6.2</version>
+						<configuration>
+							<htmlOutput>true</htmlOutput>
+							<excludeFilterFile>${session.executionRootDirectory}/spotbugs-exclude.xml</excludeFilterFile>
+							<plugins>
+								<plugin>
+									<groupId>com.h3xstream.findsecbugs</groupId>
+									<artifactId>findsecbugs-plugin</artifactId>
+									<version>1.13.0</version>
+								</plugin>
+							</plugins>
+						</configuration>
+						<executions>
+							<execution>
+								<phase>test</phase>
+								<goals>
+									<goal>spotbugs</goal>
 								</goals>
 							</execution>
 						</executions>
@@ -259,7 +283,7 @@
 					<version>false</version>
 					<nosince>true</nosince>
 					<notimestamp>true</notimestamp>
-					<bottom><![CDATA[Copyright &copy; 2023 <a href=\"https://www.cicirello.org/\" target=_top>Vincent A. Cicirello</a>.  All rights reserved.]]></bottom>
+					<bottom><![CDATA[Copyright &copy; 2023-2024 <a href=\"https://www.cicirello.org/\" target=_top>Vincent A. Cicirello</a>.  All rights reserved.]]></bottom>
 				</configuration>
 			</plugin>
 			<plugin>

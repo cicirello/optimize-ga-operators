@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

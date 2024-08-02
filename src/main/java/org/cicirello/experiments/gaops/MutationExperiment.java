@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ public class MutationExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%4s\t%12s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
+          "%4s\t%12s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfM = new DoubleList();
       for (double m = 1.0 / bitLength; m - 0.25 <= 1E-10; m *= 2) {
@@ -115,7 +115,7 @@ public class MutationExperiment {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%11.10f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            "%4d\t%11.10f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g%n",
             bitLength, m, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
@@ -130,7 +130,7 @@ public class MutationExperiment {
   }
 
   /** The commonly found implementation of bit-flip mutation. */
-  public static class SimpleBitFlipMutation implements MutationOperator<BitVector> {
+  public static final class SimpleBitFlipMutation implements MutationOperator<BitVector> {
 
     private final double m;
 

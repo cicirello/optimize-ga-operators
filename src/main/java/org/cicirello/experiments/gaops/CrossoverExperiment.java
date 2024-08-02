@@ -1,6 +1,6 @@
 /*
  * Experiments related to optimizing genetic algorithm operators.
- * Copyright (C) 2023 Vincent A. Cicirello
+ * Copyright (C) 2023-2024 Vincent A. Cicirello
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ public class CrossoverExperiment {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    for (double u = 0.1; u < 0.55; u += 0.1) {
+    double[] rates = {0.1, 0.2, 0.3, 0.4, 0.5};
+    for (double u : rates) {
       SimpleUniformCrossover simple = new SimpleUniformCrossover(u);
       UniformCrossover optimized = new UniformCrossover(u);
       BitVector v1 = new BitVector(1024, true);
@@ -87,10 +88,10 @@ public class CrossoverExperiment {
 
     for (int bitLength = 16; bitLength <= 1024; bitLength *= 2) {
       System.out.printf(
-          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s\n",
+          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
       DoubleList valuesOfU = new DoubleList();
-      for (double u = 0.1; u < 0.55; u += 0.1) {
+      for (double u : rates) {
         valuesOfU.add(u);
       }
       for (int i = 0; i < valuesOfU.size(); i++) {
@@ -120,7 +121,7 @@ public class CrossoverExperiment {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g\n",
+            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g%n",
             bitLength, u, timeSimpleSeconds, timeOptimizedSeconds, percentLessTime, t, dof, p);
       }
       System.out.println();
@@ -135,7 +136,7 @@ public class CrossoverExperiment {
   }
 
   /** The commonly found implementation of uniform crossover. */
-  public static class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
+  public static final class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
 
     private final double p;
 
