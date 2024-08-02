@@ -135,7 +135,7 @@ public class CrossoverExperiment {
   }
 
   /** The commonly found implementation of uniform crossover. */
-  public static class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
+  public static final class SimpleUniformCrossover implements CrossoverOperator<BitVector> {
 
     private final double p;
 

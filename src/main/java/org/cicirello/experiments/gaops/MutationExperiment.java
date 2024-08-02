@@ -130,7 +130,7 @@ public class MutationExperiment {
   }
 
   /** The commonly found implementation of bit-flip mutation. */
-  public static class SimpleBitFlipMutation implements MutationOperator<BitVector> {
+  public static final class SimpleBitFlipMutation implements MutationOperator<BitVector> {
 
     private final double m;
 

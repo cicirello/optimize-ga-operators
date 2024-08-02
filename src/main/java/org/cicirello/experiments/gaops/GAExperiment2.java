@@ -221,7 +221,7 @@ public class GAExperiment2 {
    * optimal is found and then terminate). This class doesn't specify a bound on the optimal
    * preventing the EA from early termination.
    */
-  private static class OneMaxFitness
+  private static final class OneMaxFitness
       implements FitnessFunction.Integer<BitVector>, IntegerCostOptimizationProblem<BitVector> {
 
     @Override

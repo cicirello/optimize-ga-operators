@@ -186,7 +186,7 @@ public class GenerationLoopExperiment {
    * the effects of optimizing the generation loop, so using a mutation that does nothing to
    * eliminate the time effects of mutation.
    */
-  private static class NoOpMutation implements MutationOperator<BitVector> {
+  private static final class NoOpMutation implements MutationOperator<BitVector> {
 
     private int state;
 
@@ -217,7 +217,7 @@ public class GenerationLoopExperiment {
    * study the effects of optimizing the generation loop, so using a crossover that does nothing to
    * eliminate the time effects of crossover.
    */
-  private static class NoOpCrossover implements CrossoverOperator<BitVector> {
+  private static final class NoOpCrossover implements CrossoverOperator<BitVector> {
 
     private int count;
 
@@ -252,7 +252,7 @@ public class GenerationLoopExperiment {
    * associated with selection to enable studying strictly the time of the two versions of the
    * generation loop.
    */
-  private static class NoOpSelection implements SelectionOperator {
+  private static final class NoOpSelection implements SelectionOperator {
 
     @Override
     public void select(PopulationFitnessVector.Integer fitnesses, int[] selected) {
@@ -279,7 +279,7 @@ public class GenerationLoopExperiment {
    * eliminate the time cost associated with fitness evaluation to enable studying strictly the time
    * of the two versions of the generation loop.
    */
-  private static class NoOpFitness
+  private static final class NoOpFitness
       implements FitnessFunction.Integer<BitVector>, IntegerCostOptimizationProblem<BitVector> {
 
     @Override
