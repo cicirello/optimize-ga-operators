@@ -36,7 +36,7 @@ import org.cicirello.util.DoubleList;
 
 /**
  * Experiment comparing CPU time of two alternative GAs: typical implementation of bit flip
- * mutation, uniform mutation, and generation loop; vs optimized version where binomial is used for
+ * mutation, uniform crossover, and generation loop; vs optimized version where binomial is used for
  * choosing which bits to mutate, cross, and which pairs of parents to cross.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
