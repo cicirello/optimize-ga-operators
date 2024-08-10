@@ -1,5 +1,5 @@
 # Experiments related to optimizing genetic algorithm operators.
-# Copyright (C) 2023 Vincent A. Cicirello
+# Copyright (C) 2023-2024 Vincent A. Cicirello
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -60,7 +60,7 @@ if __name__ == "__main__":
 
     y_label = "CPU time (seconds)"
 
-    w = 3.5
+    w = 3
     h = w / 2
     matplotlib.pyplot.rc('font', size=9)
     matplotlib.pyplot.rc('text', usetex=True)
@@ -85,8 +85,24 @@ if __name__ == "__main__":
             optimized,
             "k--",
             label="optimized")
-        if "mutation" == base_filename:
+        legend_corners = {
+            16 : (0.05, 0.2),
+            64 : (0.1, 0.2),
+            256 : (0.1, 0.2),
+            1024 : (0.1, 0.2)
+        }
+        legend_corners_cross = {
+            16 : (0.375, 0.04),
+            64 : (0.35, 0.03),
+            256 : (0.6, 0.425),
+            1024 : (0.55, 0.4)
+        }
+        if "mutation" == base_filename and d[0][0] in legend_corners:
+            ax.legend(loc=legend_corners[d[0][0]])
+        elif "mutation" == base_filename:
             ax.legend(loc="center")
+        elif "crossover" == base_filename and d[0][0] in legend_corners_cross:
+            ax.legend(loc=legend_corners_cross[d[0][0]])
         elif "crossover" == base_filename and d[0][0] >= 128 and d[0][0] <= 512:
             ax.legend(loc="center")
         else:

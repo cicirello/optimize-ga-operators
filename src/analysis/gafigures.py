@@ -1,5 +1,5 @@
 # Experiments related to optimizing genetic algorithm operators.
-# Copyright (C) 2023 Vincent A. Cicirello
+# Copyright (C) 2023-2024 Vincent A. Cicirello
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,7 +71,7 @@ if __name__ == "__main__":
 
     y_label = "CPU time (seconds)"
 
-    w = 3.5
+    w = 3
     h = w / 2
     matplotlib.pyplot.rc('font', size=9)
     matplotlib.pyplot.rc('text', usetex=True)
