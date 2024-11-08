@@ -43,6 +43,10 @@ import org.cicirello.util.DoubleList;
  * mutate and which pairs of parents to cross. Both versions use standard implementation of
  * single-point (in first runs) and two-point crossover.
  *
+ * <p>Vincent A. Cicirello. Optimizing Genetic Algorithms Using the Binomial Distribution.
+ * <i>Proceedings of the 16th International Joint Conference on Computational Intelligence</i>,
+ * pages 159-169. November 2024.
+ *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */

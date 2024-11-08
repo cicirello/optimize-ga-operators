@@ -12,7 +12,9 @@
 	<name>Experiments related to optimizing genetic algorithm operators</name>
 	
 	<description>This package contains Java code to reproduce the experiments
-	of ADD-DETAILS-LATER-RELATED-TO-ARTICLE.
+	of: Vincent A. Cicirello. Optimizing Genetic Algorithms Using the Binomial 
+	Distribution. Proceedings of the 16th International Joint Conference on 
+	Computational Intelligence, pages 159-169. November 2024.
 	</description>
 	
 	<url>https://github.com/cicirello/optimize-ga-operators</url>

@@ -19,7 +19,9 @@
 /**
  * Code to reproduce the experiments from the following article:
  *
- * <p>INSERT DETAILS HERE LATER
+ * <p>Vincent A. Cicirello. Optimizing Genetic Algorithms Using the Binomial Distribution.
+ * <i>Proceedings of the 16th International Joint Conference on Computational Intelligence</i>,
+ * pages 159-169. November 2024.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
