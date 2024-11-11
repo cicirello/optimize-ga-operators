@@ -39,6 +39,10 @@ import org.cicirello.util.DoubleList;
  * mutation, uniform crossover, and generation loop; vs optimized version where binomial is used for
  * choosing which bits to mutate, cross, and which pairs of parents to cross.
  *
+ * <p>Vincent A. Cicirello. Optimizing Genetic Algorithms Using the Binomial Distribution.
+ * <i>Proceedings of the 16th International Joint Conference on Computational Intelligence</i>,
+ * pages 159-169. November 2024.
+ *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
