@@ -1,0 +1,21 @@
+OS: Windows 10
+CPU: AMD A10-5700, 3.4 GHz
+Memory: 8 GB DDR3
+
+Experiment programs
+Compiler: OpenJDK 17.0.2
+Target: Java 17
+VM: OpenJDK 64-bit Server VM Temurin-17.0.2+8 (build 17.0.2+8)
+
+chips-n-salsa library
+Release: 7.0.0 (from Maven Central)
+
+JavaPermutationTools library
+Release: 6.0.0 (from Maven Central)
+
+rho-mu library
+Release: 4.1.0 (from Maven Central)
+
+org.cicirello.core library
+Release: 2.7.0 (from Maven Central)
+
