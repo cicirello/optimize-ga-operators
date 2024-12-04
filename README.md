@@ -5,9 +5,9 @@ Copyright &copy; 2023-2024 Vincent A. Cicirello
 This repository contains code to reproduce the experiments, and analysis of 
 experimental data, from the following paper:
 
-> Vincent A. Cicirello. 2024. Optimizing Genetic Algorithms Using the Binomial Distribution. *Proceedings of the 16th International Joint Conference on Computational Intelligence*, pages 159-169. November 2024.
+> Vincent A. Cicirello. 2024. [Optimizing Genetic Algorithms Using the Binomial Distribution](https://www.cicirello.org/publications/cicirello2024ecta-optimize-ga.pdf). *Proceedings of the 16th International Joint Conference on Computational Intelligence*, pages 159-169. November 2024. doi:[10.5220/0013038300003837](https://doi.org/10.5220/0013038300003837).
 
-| __Publication__ | |
+| __Publication__ | [![doi:10.5220/0013038300003837](doi.svg)](https://doi.org/10.5220/0013038300003837) |
 | :--- | :--- |
 | __License__ | [![GitHub](https://img.shields.io/github/license/cicirello/optimize-ga-operators)](LICENSE) |
 
