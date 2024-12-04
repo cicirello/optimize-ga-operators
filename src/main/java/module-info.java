@@ -21,7 +21,9 @@
  *
  * <p>Vincent A. Cicirello. Optimizing Genetic Algorithms Using the Binomial Distribution.
  * <i>Proceedings of the 16th International Joint Conference on Computational Intelligence</i>,
- * pages 159-169. November 2024.
+ * pages 159-169. November 2024. DOI:<a
+ * href="https://doi.org/10.5220/0013038300003837">10.5220/0013038300003837</a> <a
+ * href="https://www.cicirello.org/publications/cicirello2024ecta-optimize-ga.pdf">[PDF]</a>
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>

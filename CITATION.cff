@@ -1,0 +1,23 @@
+cff-version: "1.2.0"
+message: "If you use this software, please cite the article from preferred-citation."
+authors: 
+- family-names: "Cicirello"
+  given-names: "Vincent A"
+  orcid: "https://orcid.org/0000-0003-1072-8559"
+title: "Optimizing Genetic Algorithms Using the Binomial Distribution"
+license: "GPL-3.0-or-later"
+url: "https://github.com/cicirello/optimize-ga-operators"
+preferred-citation:
+  type: conference-paper
+  authors:
+  - family-names: "Cicirello"
+    given-names: "Vincent A"
+    orcid: "https://orcid.org/0000-0003-1072-8559"
+  title: "Optimizing Genetic Algorithms Using the Binomial Distribution"
+  collection-title: "Proceedings of the 16th International Joint Conference on Computational Intelligence"
+  collection-type: proceedings
+  doi: "10.5220/0013038300003837"
+  year: 2024
+  month: 11
+  start: 159
+  end: 169
