@@ -37,10 +37,19 @@ epstopdf:
 	epstopdf ${pathToDataFiles}/ga2.1p.eps
 	epstopdf ${pathToDataFiles}/ga2.2p.eps
 
-# Runs all experiments
+# Runs all experiments from the extended journal article
 
 .PHONY: experiments
-experiments: bitmasks mutation crossover generation ga ga2
+experiments: uobx
+
+# Runs all experiments from the ECTA 2024 paper
+
+.PHONY: experimentsECTA
+experimentsECTA: bitmasks mutation crossover generation ga ga2
+
+.PHONY: uobx
+uobx: 
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUOBX > ${pathToDataFiles}/uobx.txt
 	
 # Experiments with two variations of generating random bit masks
 
