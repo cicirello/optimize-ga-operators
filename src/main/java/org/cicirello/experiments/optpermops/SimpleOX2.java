@@ -21,38 +21,37 @@ package org.cicirello.experiments.optpermops;
 import java.util.random.RandomGenerator;
 import org.cicirello.math.rand.EnhancedSplittableGenerator;
 import org.cicirello.permutations.Permutation;
-import org.cicirello.permutations.PermutationBinaryOperator;
+import org.cicirello.permutations.PermutationFullBinaryOperator;
 import org.cicirello.search.operators.CrossoverOperator;
 import org.cicirello.util.IntegerArray;
 
 /**
- * Non-optimized version of Uniform Order-Based Crossover (UOBX) operator, implemented in the
- * obvious way.
+ * Non-optimized version of Order Crossover 2 (OX2) operator, implemented in the obvious way.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
-public final class SimpleUOBX implements CrossoverOperator<Permutation>, PermutationBinaryOperator {
+public final class SimpleOX2
+    implements CrossoverOperator<Permutation>, PermutationFullBinaryOperator {
 
   private final double u;
   private final EnhancedSplittableGenerator generator;
 
   /**
-   * Constructs a non-optimized Uniform Order-Based Crossover (UOBX) operator, implemented in the
-   * obvious way.
+   * Constructs a non-optimized Order Crossover 2 (OX2) operator, implemented in the obvious way.
    *
    * @param u The probability of an index being among the fixed-point positions.
    * @throws IllegalArgumentException if u is less than or equal to 0.0, or if u is greater than or
    *     equal to 1.0.
    */
-  public SimpleUOBX(double u) {
+  public SimpleOX2(double u) {
     if (u <= 0 || u >= 1.0) throw new IllegalArgumentException("u must be: 0.0 < u < 1.0");
     this.u = u;
     generator =
         new EnhancedSplittableGenerator(RandomGenerator.SplittableGenerator.of("SplittableRandom"));
   }
 
-  private SimpleUOBX(SimpleUOBX other) {
+  private SimpleOX2(SimpleOX2 other) {
     generator = other.generator.split();
     u = other.u;
   }
@@ -62,49 +61,55 @@ public final class SimpleUOBX implements CrossoverOperator<Permutation>, Permuta
     c1.apply(this, c2);
   }
 
+  @Override
+  public SimpleOX2 split() {
+    return new SimpleOX2(this);
+  }
+
   /**
-   * See {@link PermutationBinaryOperator} for details of this method. This method is not intended
-   * for direct usage. Use the {@link #cross} method instead.
+   * See {@link PermutationFullBinaryOperator} for details of this method. This method is not
+   * intended for direct usage. Use the {@link #cross} method instead.
    *
    * @param raw1 The raw representation of the first permutation.
    * @param raw2 The raw representation of the second permutation.
+   * @param p1 The first permutation.
+   * @param p2 The second permutation.
    */
   @Override
-  public void apply(int[] raw1, int[] raw2) {
-    int orderedCount = raw1.length;
-    boolean[] mask = new boolean[raw1.length];
-    boolean[] in1 = new boolean[raw1.length];
-    boolean[] in2 = new boolean[raw1.length];
-    for (int k = 0; k < mask.length; k++) {
-      if (generator.nextDouble() < u) {
-        mask[k] = true;
-        in1[raw1[k]] = true;
-        in2[raw2[k]] = true;
-        orderedCount--;
-      }
-    }
-    IntegerArray list1 = new IntegerArray(orderedCount);
-    IntegerArray list2 = new IntegerArray(orderedCount);
-    for (int k = 0; k < raw1.length; k++) {
-      if (!in2[raw1[k]]) {
-        list1.add(raw1[k]);
-      }
-      if (!in1[raw2[k]]) {
-        list2.add(raw2[k]);
-      }
-    }
-    int w = 0;
-    for (int k = 0; k < mask.length; k++) {
-      if (!mask[k]) {
-        raw1[k] = list2.get(w);
-        raw2[k] = list1.get(w);
-        w++;
-      }
-    }
+  public void apply(int[] raw1, int[] raw2, Permutation p1, Permutation p2) {
+    internalCross(raw1, raw2, p1, p2, generator);
   }
 
-  @Override
-  public SimpleUOBX split() {
-    return new SimpleUOBX(this);
+  /*
+   * package private to facilitate testing
+   */
+  final void internalCross(
+      int[] raw1, int[] raw2, Permutation p1, Permutation p2, EnhancedSplittableGenerator r) {
+    int[] inv1 = p1.getInverse();
+    int[] inv2 = p2.getInverse();
+    IntegerArray elementOrder1 = new IntegerArray(raw1.length);
+    IntegerArray elementOrder2 = new IntegerArray(raw1.length);
+    boolean[] indexes1 = new boolean[raw1.length];
+    boolean[] indexes2 = new boolean[raw1.length];
+    for (int i = 0; i < raw1.length; i++) {
+      if (r.nextDouble() < u) {
+        elementOrder1.add(raw2[i]);
+        elementOrder2.add(raw1[i]);
+        indexes1[inv1[raw2[i]]] = true;
+        indexes2[inv2[raw1[i]]] = true;
+      }
+    }
+    int j = 0;
+    int k = 0;
+    for (int i = 0; i < indexes1.length; i++) {
+      if (indexes1[i]) {
+        raw1[i] = elementOrder1.get(j);
+        j++;
+      }
+      if (indexes2[i]) {
+        raw2[i] = elementOrder2.get(k);
+        k++;
+      }
+    }
   }
 }

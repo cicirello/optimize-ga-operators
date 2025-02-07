@@ -25,16 +25,16 @@ import org.cicirello.math.rand.EnhancedRandomGenerator;
 import org.cicirello.math.stats.Statistics;
 import org.cicirello.permutations.Permutation;
 import org.cicirello.search.operators.CrossoverOperator;
-import org.cicirello.search.operators.permutations.UniformOrderBasedCrossover;
+import org.cicirello.search.operators.permutations.OrderCrossoverTwo;
 import org.cicirello.util.DoubleList;
 
 /**
- * Experiment comparing CPU time of two alternative UOBX implementations.
+ * Experiment comparing CPU time of two alternative OX2 implementations.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
-public class ExperimentUOBX {
+public class ExperimentOX2 {
 
   /** Number of trials to average. */
   private static final int TRIALS = 100;
@@ -84,8 +84,8 @@ public class ExperimentUOBX {
     System.out.println("Warming up the Java JIT");
     double[] rates = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     for (double u : rates) {
-      SimpleUOBX simple = new SimpleUOBX(u);
-      UniformOrderBasedCrossover optimized = new UniformOrderBasedCrossover(u);
+      SimpleOX2 simple = new SimpleOX2(u);
+      OrderCrossoverTwo optimized = new OrderCrossoverTwo(u);
       ArrayList<Permutation> perms1 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
       ArrayList<Permutation> perms2 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
       ArrayList<Permutation> perms1opt = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
@@ -118,8 +118,8 @@ public class ExperimentUOBX {
 
       for (int i = 0; i < valuesOfU.size(); i++) {
         double u = valuesOfU.get(i);
-        SimpleUOBX simple = new SimpleUOBX(u);
-        UniformOrderBasedCrossover optimized = new UniformOrderBasedCrossover(u);
+        SimpleOX2 simple = new SimpleOX2(u);
+        OrderCrossoverTwo optimized = new OrderCrossoverTwo(u);
 
         double[][] ms = new double[2][TRIALS];
         for (int j = 0; j < TRIALS; j++) {
