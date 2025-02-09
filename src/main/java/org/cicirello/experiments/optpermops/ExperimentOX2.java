@@ -55,7 +55,6 @@ public class ExperimentOX2 {
       CrossoverOperator<Permutation> crossover,
       ArrayList<Permutation> perms1,
       ArrayList<Permutation> perms2) {
-    int useToPreventOptimizingAway = 0;
     for (int i = 0; i < SAMPLES_PER_TRIAL; i++) {
       Permutation p1 = perms1.get(i);
       Permutation p2 = perms2.get(i);

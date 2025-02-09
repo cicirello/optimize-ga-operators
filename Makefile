@@ -40,7 +40,7 @@ epstopdf:
 # Runs all experiments from the extended journal article
 
 .PHONY: experiments
-experiments: uobx ox2
+experiments: uobx ox2 upmx
 
 # Runs all experiments from the ECTA 2024 paper
 
@@ -51,13 +51,19 @@ experimentsECTA: bitmasks mutation crossover generation ga ga2
 
 .PHONY: uobx
 uobx: 
-	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUOBX > ${pathToDataFiles}/uobx.txt
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUOBX > ${pathToDataFiles}/perm.uobx.txt
 
 # Experiments with two variations of OX2 crossover for permutations
 
 .PHONY: ox2
 ox2: 
-	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentOX2 > ${pathToDataFiles}/ox2.txt
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentOX2 > ${pathToDataFiles}/perm.ox2.txt
+
+# Experiments with two variations of UPMX crossover for permutations
+
+.PHONY: upmx
+upmx: 
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUPMX > ${pathToDataFiles}/perm.upmx.txt
 	
 # Experiments with two variations of generating random bit masks
 
