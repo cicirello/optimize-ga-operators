@@ -85,14 +85,20 @@ public final class SimpleOX2
    */
   final void internalCross(
       int[] raw1, int[] raw2, Permutation p1, Permutation p2, EnhancedSplittableGenerator r) {
+    boolean[] mask = new boolean[raw1.length];
+    for (int i = 0; i < mask.length; i++) {
+      if (r.nextDouble() < u) {
+        mask[i] = true;
+      }
+    }
     int[] inv1 = p1.getInverse();
     int[] inv2 = p2.getInverse();
     IntegerArray elementOrder1 = new IntegerArray(raw1.length);
     IntegerArray elementOrder2 = new IntegerArray(raw1.length);
     boolean[] indexes1 = new boolean[raw1.length];
     boolean[] indexes2 = new boolean[raw1.length];
-    for (int i = 0; i < raw1.length; i++) {
-      if (r.nextDouble() < u) {
+    for (int i = 0; i < mask.length; i++) {
+      if (mask[i]) {
         elementOrder1.add(raw2[i]);
         elementOrder2.add(raw1[i]);
         indexes1[inv1[raw2[i]]] = true;
