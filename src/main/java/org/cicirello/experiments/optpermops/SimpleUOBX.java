@@ -73,14 +73,21 @@ public final class SimpleUOBX implements CrossoverOperator<Permutation>, Permuta
   public void apply(int[] raw1, int[] raw2) {
     int orderedCount = raw1.length;
     boolean[] mask = new boolean[raw1.length];
-    boolean[] in1 = new boolean[raw1.length];
-    boolean[] in2 = new boolean[raw1.length];
     for (int k = 0; k < mask.length; k++) {
       if (generator.nextDouble() < u) {
         mask[k] = true;
+        orderedCount--;
+      }
+    }
+    if (orderedCount == 0) {
+      return;
+    }
+    boolean[] in1 = new boolean[raw1.length];
+    boolean[] in2 = new boolean[raw1.length];
+    for (int k = 0; k < mask.length; k++) {
+      if (mask[k]) {
         in1[raw1[k]] = true;
         in2[raw2[k]] = true;
-        orderedCount--;
       }
     }
     IntegerArray list1 = new IntegerArray(orderedCount);
