@@ -86,12 +86,18 @@ public final class SimpleUPMX
    */
   final void internalCross(
       int[] raw1, int[] raw2, Permutation c1, Permutation c2, EnhancedSplittableGenerator r) {
+    boolean[] mask = new boolean[raw1.length];
+    for (int k = 0; k < raw1.length; k++) {
+      if (r.nextDouble() < u) {
+        mask[k] = true;
+      }
+    }
     int[] inv1 = c1.getInverse();
     int[] inv2 = c2.getInverse();
     int[] old1 = raw1.clone();
     int[] old2 = raw2.clone();
     for (int k = 0; k < raw1.length; k++) {
-      if (r.nextDouble() < u) {
+      if (mask[k]) {
         int g = inv1[old2[k]];
         if (k != g) {
           int temp = raw1[k];
