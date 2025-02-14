@@ -40,7 +40,7 @@ epstopdf:
 # Runs all experiments from the extended journal article
 
 .PHONY: experiments
-experiments: uobx ox2 upmx
+experiments: uobx ox2 upmx uppx
 
 # Runs all experiments from the ECTA 2024 paper
 
@@ -64,6 +64,12 @@ ox2:
 .PHONY: upmx
 upmx: 
 	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUPMX > ${pathToDataFiles}/perm.upmx.txt
+
+# Experiments with two variations of UPPX crossover for permutations
+
+.PHONY: uppx
+uppx: 
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentUPPX > ${pathToDataFiles}/perm.uppx.txt
 	
 # Experiments with two variations of generating random bit masks
 
