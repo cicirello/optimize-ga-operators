@@ -20,21 +20,20 @@ package org.cicirello.experiments.optpermops;
 
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadMXBean;
-import java.util.ArrayList;
 import org.cicirello.math.rand.EnhancedRandomGenerator;
 import org.cicirello.math.stats.Statistics;
 import org.cicirello.permutations.Permutation;
-import org.cicirello.search.operators.CrossoverOperator;
-import org.cicirello.search.operators.permutations.UniformOrderBasedCrossover;
+import org.cicirello.search.operators.MutationOperator;
+import org.cicirello.search.operators.permutations.UniformScrambleMutation;
 import org.cicirello.util.DoubleList;
 
 /**
- * Experiment comparing CPU time of two alternative UOBX implementations.
+ * Experiment comparing CPU time of two alternative implementations of uniform scramble mutation.
  *
  * @author <a href=https://www.cicirello.org/ target=_top>Vincent A. Cicirello</a>, <a
  *     href=https://www.cicirello.org/ target=_top>https://www.cicirello.org/</a>
  */
-public class ExperimentUOBX {
+public class ExperimentUniformScrambleMutation {
 
   /** Number of trials to average. */
   private static final int TRIALS = 100;
@@ -43,27 +42,19 @@ public class ExperimentUOBX {
   private static final int SAMPLES_PER_TRIAL = 10000;
 
   /**
-   * Crosses 2 Permutations SAMPLES_PER_TRIAL times.
+   * Mutates one Permutation SAMPLES_PER_TRIAL times.
    *
-   * @param crossover the crossover operator
-   * @param perms1 list of Permutations
-   * @param perms2 another list of Permutations
+   * @param mutation the mutation operator
+   * @param p a Permutation
    */
-  public static void crossoverCodeToTime(
-      CrossoverOperator<Permutation> crossover,
-      ArrayList<Permutation> perms1,
-      ArrayList<Permutation> perms2) {
+  public static void mutationCodeToTime(MutationOperator<Permutation> mutation, Permutation p) {
     for (int i = 0; i < SAMPLES_PER_TRIAL; i++) {
-      Permutation p1 = perms1.get(i);
-      Permutation p2 = perms2.get(i);
-      crossover.cross(p1, p2);
-
-      // Use a blackhole to consume the permutations after the cross
-      // to prevent just-in-time compiler from falsely eliminating the
-      // benchmark code as dead code.
-      blackhole.consume(p1);
-      blackhole.consume(p2);
+      mutation.mutate(p);
     }
+    // Use a blackhole to consume the permutation to prevent
+    // just-in-time compiler from falsely eliminating the
+    // benchmark code as dead code.
+    blackhole.consume(p);
   }
 
   private static final Blackhole blackhole = new Blackhole();
@@ -81,28 +72,21 @@ public class ExperimentUOBX {
     System.out.println("Warming up the Java JIT");
     double[] rates = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
     for (double u : rates) {
-      SimpleUOBX simple = new SimpleUOBX(u);
-      UniformOrderBasedCrossover optimized = new UniformOrderBasedCrossover(u);
-      ArrayList<Permutation> perms1 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-      ArrayList<Permutation> perms2 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-      ArrayList<Permutation> perms1opt = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-      ArrayList<Permutation> perms2opt = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-      for (int j = 0; j < SAMPLES_PER_TRIAL; j++) {
-        perms1.add(new Permutation(1024));
-        perms2.add(new Permutation(1024));
-        perms1opt.add(perms1.get(j).copy());
-        perms2opt.add(perms2.get(j).copy());
-      }
-      crossoverCodeToTime(simple, perms1, perms2);
-      crossoverCodeToTime(optimized, perms1opt, perms2opt);
+      SimpleUniformScramble simple = new SimpleUniformScramble(u);
+      UniformScrambleMutation optimized = new UniformScrambleMutation(u);
+      Permutation p1 = new Permutation(1024);
+      Permutation p2 = new Permutation(1024);
+      mutationCodeToTime(simple, p1);
+      mutationCodeToTime(optimized, p2);
+
+      // Use a blackhole to consume the permutation to prevent
+      // just-in-time compiler from falsely eliminating the
+      // benchmark code as dead code.
+      blackhole.consume(p1);
+      blackhole.consume(p2);
     }
     System.out.println("End Warmup Phase");
     System.out.println();
-
-    ArrayList<Permutation> perms1 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-    ArrayList<Permutation> perms2 = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-    ArrayList<Permutation> perms1opt = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
-    ArrayList<Permutation> perms2opt = new ArrayList<Permutation>(SAMPLES_PER_TRIAL);
 
     for (int permutationLength = 128; permutationLength <= 1024; permutationLength *= 8) {
       System.out.printf(
@@ -113,31 +97,30 @@ public class ExperimentUOBX {
         valuesOfU.add(u);
       }
 
+      Permutation p1 = new Permutation(permutationLength);
+      Permutation p2 = new Permutation(permutationLength);
+
       for (int i = 0; i < valuesOfU.size(); i++) {
         double u = valuesOfU.get(i);
-        SimpleUOBX simple = new SimpleUOBX(u);
-        UniformOrderBasedCrossover optimized = new UniformOrderBasedCrossover(u);
+        SimpleUniformScramble simple = new SimpleUniformScramble(u);
+        UniformScrambleMutation optimized = new UniformScrambleMutation(u);
 
         double[][] ms = new double[2][TRIALS];
         for (int j = 0; j < TRIALS; j++) {
-          perms1.clear();
-          perms2.clear();
-          perms1opt.clear();
-          perms2opt.clear();
-          for (int k = 0; k < SAMPLES_PER_TRIAL; k++) {
-            perms1.add(new Permutation(permutationLength));
-            perms2.add(new Permutation(permutationLength));
-            perms1opt.add(perms1.get(k).copy());
-            perms2opt.add(perms2.get(k).copy());
-          }
           long start = bean.getCurrentThreadCpuTime();
-          crossoverCodeToTime(simple, perms1, perms2);
+          mutationCodeToTime(simple, p1);
           long middle = bean.getCurrentThreadCpuTime();
-          crossoverCodeToTime(optimized, perms1opt, perms2opt);
+          mutationCodeToTime(optimized, p2);
           long end = bean.getCurrentThreadCpuTime();
           // compute elapsed times in nanoseconds
           ms[0][j] = (middle - start);
           ms[1][j] = (end - middle);
+
+          // Use a blackhole to consume the permutation to prevent
+          // just-in-time compiler from falsely eliminating the
+          // benchmark code as dead code.
+          blackhole.consume(p1);
+          blackhole.consume(p2);
         }
         Number[] tTest = Statistics.tTestWelch(ms[0], ms[1]);
         double t = tTest[0].doubleValue();

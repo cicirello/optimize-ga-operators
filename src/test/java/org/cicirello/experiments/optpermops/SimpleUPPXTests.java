@@ -28,6 +28,7 @@ import org.junit.jupiter.api.*;
 
 /** JUnit tests for SimpleUPPX. */
 public class SimpleUPPXTests {
+
   @Test
   public void testUPPXIdentical() {
     SimpleUPPX ppx = new SimpleUPPX(0.5);

@@ -46,10 +46,8 @@ public class ExperimentUPPX {
    * Crosses 2 Permutations SAMPLES_PER_TRIAL times.
    *
    * @param crossover the crossover operator
-   * @param v1 a Permutation
-   * @param v2 another Permutation
-   * @return a meaningless value dependent upon result of all crossovers for purpose of preventing
-   *     JIT from optimizing away the computation
+   * @param perms1 list of Permutations
+   * @param perms2 another list of Permutations
    */
   public static void crossoverCodeToTime(
       CrossoverOperator<Permutation> crossover,
