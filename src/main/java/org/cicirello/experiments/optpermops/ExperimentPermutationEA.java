@@ -28,10 +28,9 @@ import org.cicirello.search.Configurator;
 import org.cicirello.search.ProgressTracker;
 import org.cicirello.search.SolutionCostPair;
 import org.cicirello.search.evo.FitnessFunction;
-import org.cicirello.search.evo.FitnessShifter;
 import org.cicirello.search.evo.GenerationalEvolutionaryAlgorithm;
 import org.cicirello.search.evo.NaiveGenerationalEvolutionaryAlgorithm;
-import org.cicirello.search.evo.StochasticUniversalSampling;
+import org.cicirello.search.evo.TruncationSelection;
 import org.cicirello.search.operators.CrossoverOperator;
 import org.cicirello.search.operators.permutations.OrderCrossoverTwo;
 import org.cicirello.search.operators.permutations.PermutationInitializer;
@@ -54,8 +53,11 @@ public class ExperimentPermutationEA {
   /** Number of trials to average. */
   private static final int TRIALS = 100;
 
+  /** Number of trials for warmup. */
+  private static final int WARMUP_TRIALS = 10;
+
   /** Number of generations for each trial. */
-  private static final int GENERATIONS_PER_TRIAL = 100;
+  private static final int GENERATIONS_PER_TRIAL = 1000;
 
   /** Size of the population. */
   private static final int POPULATION_SIZE = 100;
@@ -73,21 +75,21 @@ public class ExperimentPermutationEA {
 
     ArrayList<CrossoverOperator<Permutation>> simpleCrossoverOperators =
         new ArrayList<CrossoverOperator<Permutation>>();
+    simpleCrossoverOperators.add(new SimpleUPMX(1.0 / 3.0));
     simpleCrossoverOperators.add(new SimpleUOBX(0.5));
     simpleCrossoverOperators.add(new SimpleOX2(0.5));
     simpleCrossoverOperators.add(new SimpleUPPX(0.5));
-    simpleCrossoverOperators.add(new SimpleUPMX(1.0 / 3.0));
 
     ArrayList<CrossoverOperator<Permutation>> optimizedCrossoverOperators =
         new ArrayList<CrossoverOperator<Permutation>>();
+    optimizedCrossoverOperators.add(new UniformPartiallyMatchedCrossover(1.0 / 3.0));
     optimizedCrossoverOperators.add(new UniformOrderBasedCrossover(0.5));
     optimizedCrossoverOperators.add(new OrderCrossoverTwo(0.5));
     optimizedCrossoverOperators.add(new UniformPrecedencePreservativeCrossover(0.5));
-    optimizedCrossoverOperators.add(new UniformPartiallyMatchedCrossover(1.0 / 3.0));
 
-    String[] crossoverNames = {"UOBX", "OX2", "UPPX", "UPMX"};
+    String[] crossoverNames = {"UPMX", "UOBX", "OX2", "UPPX"};
 
-    final int PERMUTATION_LENGTH = 1024;
+    final int PERMUTATION_LENGTH = 128;
 
     PermutationInAHaystackFitness fitness = new PermutationInAHaystackFitness(PERMUTATION_LENGTH);
 
@@ -106,31 +108,34 @@ public class ExperimentPermutationEA {
       String experimentName = crossoverNames[i];
 
       for (double c : rates) {
-        @SuppressWarnings("deprecation")
-        NaiveGenerationalEvolutionaryAlgorithm<Permutation> simple =
-            new NaiveGenerationalEvolutionaryAlgorithm<Permutation>(
-                POPULATION_SIZE,
-                mutation.split(),
-                1,
-                simpleCrossover.split(),
-                c,
-                new PermutationInitializer(PERMUTATION_LENGTH),
-                fitness,
-                new FitnessShifter(new StochasticUniversalSampling()));
+        for (int j = 0; j < WARMUP_TRIALS; j++) {
+          @SuppressWarnings("deprecation")
+          NaiveGenerationalEvolutionaryAlgorithm<Permutation> simple =
+              new NaiveGenerationalEvolutionaryAlgorithm<Permutation>(
+                  POPULATION_SIZE,
+                  mutation.split(),
+                  1,
+                  simpleCrossover.split(),
+                  c,
+                  new PermutationInitializer(PERMUTATION_LENGTH),
+                  fitness,
+                  new TruncationSelection(32));
 
-        GenerationalEvolutionaryAlgorithm<Permutation> optimized =
-            new GenerationalEvolutionaryAlgorithm<Permutation>(
-                POPULATION_SIZE,
-                mutation.split(),
-                1,
-                optimizedCrossover.split(),
-                c,
-                new PermutationInitializer(PERMUTATION_LENGTH),
-                fitness,
-                new FitnessShifter(new StochasticUniversalSampling()));
+          GenerationalEvolutionaryAlgorithm<Permutation> optimized =
+              new GenerationalEvolutionaryAlgorithm<Permutation>(
+                  POPULATION_SIZE,
+                  mutation.split(),
+                  1,
+                  optimizedCrossover.split(),
+                  c,
+                  new PermutationInitializer(PERMUTATION_LENGTH),
+                  fitness,
+                  new TruncationSelection(32));
 
-        useToPreventFalseDeadCodeElimination += simple.optimize(GENERATIONS_PER_TRIAL).getCost();
-        useToPreventFalseDeadCodeElimination += optimized.optimize(GENERATIONS_PER_TRIAL).getCost();
+          useToPreventFalseDeadCodeElimination += simple.optimize(GENERATIONS_PER_TRIAL).getCost();
+          useToPreventFalseDeadCodeElimination +=
+              optimized.optimize(GENERATIONS_PER_TRIAL).getCost();
+        }
       }
     }
     System.out.println("End Warmup Phase:" + useToPreventFalseDeadCodeElimination);
@@ -170,7 +175,7 @@ public class ExperimentPermutationEA {
                 c,
                 new PermutationInitializer(PERMUTATION_LENGTH),
                 fitness,
-                new FitnessShifter(new StochasticUniversalSampling()));
+                new TruncationSelection(32));
 
         GenerationalEvolutionaryAlgorithm<Permutation> optimized =
             new GenerationalEvolutionaryAlgorithm<Permutation>(
@@ -181,7 +186,7 @@ public class ExperimentPermutationEA {
                 c,
                 new PermutationInitializer(PERMUTATION_LENGTH),
                 fitness,
-                new FitnessShifter(new StochasticUniversalSampling()));
+                new TruncationSelection(32));
 
         double[][] ms = new double[2][TRIALS];
         int[][] solutionCost = new int[2][TRIALS];
@@ -210,7 +215,13 @@ public class ExperimentPermutationEA {
         Number[] tTestCounts = Statistics.tTestWelch(solutionCost[0], solutionCost[1]);
         double tCost = tTestCounts[0].doubleValue();
         int dofCost = tTestCounts[1].intValue();
-        double pCost = Statistics.p(tCost, dofCost);
+        double pCost = 1;
+        try {
+          double temp = Statistics.p(tCost, dofCost);
+          pCost = temp;
+        } catch (ArithmeticException e) {
+          pCost = 1;
+        }
 
         // times are converted to seconds during output
         double timeSimpleSeconds = Statistics.mean(ms[0]) / 1000000000.0;

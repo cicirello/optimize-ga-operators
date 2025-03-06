@@ -40,7 +40,7 @@ epstopdf:
 # Runs all experiments from both original and extended papers
 
 .PHONY: experiments
-experiments: permEA
+experiments: permOnePlusOne permEA
 
 # Runs all experiments from the extended journal article
 
@@ -56,6 +56,11 @@ experimentsECTA: bitmasks mutation crossover generation ga ga2
 .PHONY: permEA
 permEA:
 	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentPermutationEA > ${pathToDataFiles}/perm.ea.txt
+
+# Experiments with permutation (1+1)-EA
+.PHONY: permOnePlusOne
+permOnePlusOne:
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentPermutationOnePlusOneEA > ${pathToDataFiles}/perm.ea1p1.txt
 
 # Experiments with two variations of UOBX crossover for permutations
 
