@@ -37,15 +37,25 @@ epstopdf:
 	epstopdf ${pathToDataFiles}/ga2.1p.eps
 	epstopdf ${pathToDataFiles}/ga2.2p.eps
 
-# Runs all experiments from the extended journal article
+# Runs all experiments from both original and extended papers
 
 .PHONY: experiments
-experiments: uobx ox2 upmx uppx scramble
+experiments: permEA
+
+# Runs all experiments from the extended journal article
+
+.PHONY: experimentsExtended
+experimentsExtended: uobx ox2 upmx uppx scramble
 
 # Runs all experiments from the ECTA 2024 paper
 
 .PHONY: experimentsECTA
 experimentsECTA: bitmasks mutation crossover generation ga ga2
+
+# Experiments with permutation EA
+.PHONY: permEA
+permEA:
+	java -cp ${JARFILE} org.cicirello.experiments.optpermops.ExperimentPermutationEA > ${pathToDataFiles}/perm.ea.txt
 
 # Experiments with two variations of UOBX crossover for permutations
 
