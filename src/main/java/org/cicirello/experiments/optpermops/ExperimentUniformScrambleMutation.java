@@ -25,7 +25,6 @@ import org.cicirello.math.stats.Statistics;
 import org.cicirello.permutations.Permutation;
 import org.cicirello.search.operators.MutationOperator;
 import org.cicirello.search.operators.permutations.UniformScrambleMutation;
-import org.cicirello.util.DoubleList;
 
 /**
  * Experiment comparing CPU time of two alternative implementations of uniform scramble mutation.
@@ -39,7 +38,7 @@ public class ExperimentUniformScrambleMutation {
   private static final int TRIALS = 100;
 
   /** Number of samples for each trial. Need multiple to ensure times are measurable. */
-  private static final int SAMPLES_PER_TRIAL = 10000;
+  private static final int SAMPLES_PER_TRIAL = 100000;
 
   /**
    * Mutates one Permutation SAMPLES_PER_TRIAL times.
@@ -70,7 +69,16 @@ public class ExperimentUniformScrambleMutation {
 
     // Attempt to "warm-up" Java's JIT compiler.
     System.out.println("Warming up the Java JIT");
-    double[] rates = {0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9};
+    double[] rates = {
+      2.0 / 1024,
+      4.0 / 1024,
+      8.0 / 1024,
+      16.0 / 1024,
+      32.0 / 1024,
+      64.0 / 1024,
+      128.0 / 1024,
+      256.0 / 1024
+    };
     for (double u : rates) {
       SimpleUniformScramble simple = new SimpleUniformScramble(u);
       UniformScrambleMutation optimized = new UniformScrambleMutation(u);
@@ -90,18 +98,21 @@ public class ExperimentUniformScrambleMutation {
 
     for (int permutationLength = 128; permutationLength <= 1024; permutationLength *= 8) {
       System.out.printf(
-          "%4s\t%2s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
+          "%4s\t%10s\t%12s\t%12s\t%11s\t%10s\t%10s\t%10s%n",
           "n", "u", "simple", "optimized", "%less-time", "t", "dof", "p");
-      DoubleList valuesOfU = new DoubleList();
-      for (double u : rates) {
-        valuesOfU.add(u);
-      }
+      /*DoubleList valuesOfU = new DoubleList();
+      for (int uNum = 2; uNum <= permutationLength / 4; uNum *= 2) {
+        valuesOfU.add(((double)uNum) / permutationLength);
+      }*/
 
       Permutation p1 = new Permutation(permutationLength);
       Permutation p2 = new Permutation(permutationLength);
 
-      for (int i = 0; i < valuesOfU.size(); i++) {
-        double u = valuesOfU.get(i);
+      for (double u : rates) {
+        if (u - 2.0 / permutationLength < 0.0) {
+          continue;
+        }
+        // double u = valuesOfU.get(i);
         SimpleUniformScramble simple = new SimpleUniformScramble(u);
         UniformScrambleMutation optimized = new UniformScrambleMutation(u);
 
@@ -132,7 +143,7 @@ public class ExperimentUniformScrambleMutation {
         double percentLessTime =
             100 * ((timeSimpleSeconds - timeOptimizedSeconds) / timeSimpleSeconds);
         System.out.printf(
-            "%4d\t%2.1f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g%n",
+            "%4d\t%10.9f\t%12.3g\t%12.3g\t%10.2f%%\t%10.4f\t%10d\t%10.3g%n",
             permutationLength,
             u,
             timeSimpleSeconds,
